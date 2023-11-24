@@ -100,7 +100,7 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'testSidebar',
             position: 'left',
-            label: 'Тестирование',
+            label: 'Тестирование ПО',
           },
           {
             type: 'docSidebar',
@@ -108,7 +108,7 @@ const config = {
             position: 'left',
             label: 'ИСРПО',
           },
-          {to: '/blog', label: 'Blog', position: 'left'},
+          {to: '/blog', label: 'Статьи и заметки', position: 'left'},
           {
             href: 'https://github.com/VLSU-KITP',
             label: 'GitHub',
