@@ -9,7 +9,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'KITP training site',
-  tagline: 'Dinosaurs are cool',
+  tagline: 'Учебные материалы по Web, ААС, РПМ, ТиППМ, ИСРПО',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -108,7 +108,7 @@ const config = {
             position: 'left',
             label: 'ИСРПО',
           },
-          {to: '/blog', label: 'Статьи и заметки', position: 'left'},
+          // {to: '/blog', label: 'Статьи и заметки', position: 'left'},
           {
             href: 'https://github.com/VLSU-KITP',
             label: 'GitHub',
