@@ -9,6 +9,8 @@
 
 [https://www.markdownguide.org/basic-syntax/](https://www.markdownguide.org/basic-syntax/)
 
+[https://habr.com/ru/articles/652867/](Рисуем диаграммы Mermaid.js в README-файлах GitHub)
+
 ## Общее задание для всех студентов
 
 **Тема:** Создание комплексного документа с использованием возможностей Markdown
