@@ -5,11 +5,11 @@
 
 ## **Теоретические сведения:**
 
-[https://gist.github.com/Jekins/2bf2d0638163f1294637](https://gist.github.com/Jekins/2bf2d0638163f1294637)
+[Руководство по оформлению Markdown файлов](https://gist.github.com/Jekins/2bf2d0638163f1294637)
 
-[https://www.markdownguide.org/basic-syntax/](https://www.markdownguide.org/basic-syntax/)
+[Basic Syntax. The Markdown elements outlined in the original design document.](https://www.markdownguide.org/basic-syntax/)
 
-[https://habr.com/ru/articles/652867/](Рисуем диаграммы Mermaid.js в README-файлах GitHub)
+[Рисуем диаграммы Mermaid.js в README-файлах GitHub](https://habr.com/ru/articles/652867/)
 
 ## Общее задание для всех студентов
 
