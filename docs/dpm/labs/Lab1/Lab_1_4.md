@@ -26,7 +26,7 @@ View English output:
 Выведите слово "προγραμματισμός" (яз. греческий) на консоль используя Unicode коды
 :::
 :::tip
-Для корректного вывода на косноль используйте
+Для корректного вывода на конcоль используйте
 ```cs
 using System;
 Console.OutputEncoding = System.Text.Encoding.UTF8;
