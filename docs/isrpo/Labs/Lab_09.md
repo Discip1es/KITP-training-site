@@ -1,246 +1,373 @@
 # Лабораторная работа №9. Использование GitHub Actions для CI/CD в .NET
 
-## Цели лабораторной работы
-1. Освоить основы работы с GitHub Actions.
-2. Настроить автоматическую сборку и тестирование .NET-приложения.
-3. Настроить автоматическое развертывание приложения.
+# Лабораторная работа: Введение в GitHub Actions для C# проектов
 
-## Документация
-[Документация по GH Actions](https://docs.github.com/ru/actions)
+## Цели работы
 
-## Описание задания
-В рамках этой лабораторной работы вы настроите Continuous Integration и Continuous Deployment (CI/CD) для простого .NET-приложения с использованием GitHub Actions.
+1. Освоить основы GitHub Actions и научиться применять его для автоматизации процессов CI/CD в проектах на C#.
+2. Научиться создавать файлы конфигурации YAML для автоматизации сборки, тестирования и анализа кода C# приложений.
+3. Изучить различные подходы к организации пайплайнов с последовательным, параллельным и комбинированным выполнением задач.
 
-## Требования
+## Теоретическая часть: Подробное введение в GitHub Actions для C# проектов
 
-1. Установленный Git.
-2. Установленный .NET SDK.
-3. Аккаунт на GitHub.
+### 1. Что такое GitHub Actions?
 
-## Шаги выполнения
+**GitHub Actions** — это встроенная в GitHub платформа для автоматизации рабочих процессов. Она позволяет создавать сценарии для выполнения автоматических действий при каждом изменении в репозитории, будь то push, pull request или даже создание тега. С помощью GitHub Actions можно построить **CI/CD пайплайн** для автоматизации процессов интеграции и развертывания, что делает работу с кодом более надёжной и быстрой.
 
-### Шаг 1: Создание .NET-приложения
+Основные преимущества GitHub Actions:
+- **Простота использования**: конфигурационные файлы легко создаются и поддерживаются.
+- **Гибкость**: GitHub Actions позволяет запускать рабочие процессы на различных операционных системах и версиях платформ.
+- **Интеграция с GitHub**: GitHub Actions тесно связан с самим репозиторием, что упрощает взаимодействие с его содержимым, доступ к переменным окружения и настройку разрешений.
+- **Масштабируемость**: GitHub Actions позволяет создавать пайплайны разной сложности — от простой сборки до сложных развертываний с несколькими этапами.
 
-1. Создайте новое .NET-приложение командой:
-   ```bash
-   dotnet new console -n SampleApp
-   cd SampleApp
-   ```
+Применение GitHub Actions в CI/CD (Continuous Integration / Continuous Deployment) помогает автоматизировать рутинные задачи и повышает надёжность выпускаемых приложений.
 
-2. Инициализируйте новый репозиторий Git:
-   ```bash
-   git init
-   ```
+### 2. Что такое YAML?
 
-3. Сделайте первый коммит:
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   ```
+**YAML** (YAML Ain't Markup Language) — это формат данных, который позволяет записывать структурированные данные в удобочитаемом виде. YAML используется для написания конфигурационных файлов в GitHub Actions. Основное его преимущество — простота и гибкость. В отличие от JSON или XML, YAML использует отступы и визуально легко воспринимается, что делает его подходящим для описания сложных структур данных.
 
-4. Создайте новый репозиторий на GitHub и свяжите его с локальным репозиторием:
-   ```bash
-   git remote add origin https://github.com/your-username/SampleApp.git
-   git push -u origin master
-   ```
+Основные принципы YAML:
+- **Структура через отступы**: данные организуются в виде отступов, что позволяет создавать вложенные структуры.
+- **Ключ-значение**: пары ключ-значение отделяются двоеточием (`:`).
+- **Списки**: элементы списка отмечаются дефисом (`-`) перед каждым элементом.
+- **Комментарии**: добавляются через символ `#`.
 
-### Шаг 2: Настройка GitHub Actions для CI
-
-1. Создайте папку `.github/workflows`:
-   ```bash
-   mkdir -p .github/workflows
-   ```
-
-2. Создайте файл `ci.yml` в папке `.github/workflows` со следующим содержимым:
-   ```yaml
-   name: .NET CI
-
-   on:
-     push:
-       branches: [ master ]
-     pull_request:
-       branches: [ master ]
-
-   jobs:
-     build:
-
-       runs-on: ubuntu-latest
-
-       steps:
-       - uses: actions/checkout@v2
-       - name: Setup .NET
-         uses: actions/setup-dotnet@v1
-         with:
-           dotnet-version: '6.0.x'
-       - name: Restore dependencies
-         run: dotnet restore
-       - name: Build
-         run: dotnet build --no-restore
-       - name: Test
-         run: dotnet test --no-build --verbosity normal
-   ```
-
-3. Сделайте коммит и пуш изменений:
-   ```bash
-   git add .
-   git commit -m "Setup GitHub Actions for CI"
-   git push
-   ```
-
-4. Перейдите на страницу Actions вашего репозитория на GitHub, чтобы убедиться, что запуск выполнен успешно.
-
-### Шаг 3: Настройка GitHub Actions для CD
-
-1. Добавьте следующие шаги в конец вашего файла `ci.yml` для развёртывания:
-   ```yaml
-   jobs:
-     build:
-       ...
-       
-       steps:
-       ...
-       - name: Publish
-         run: dotnet publish -c Release -o out
-       - name: Deploy to Azure App Service
-         uses: azure/webapps-deploy@v2
-         with:
-           app-name: 'YOUR_APP_SERVICE_NAME'
-           slot-name: 'production'
-           publish-profile: ${{ secrets.AzureWebAppPublishProfile }}
-           package: './out'
-   ```
-
-2. На портале Azure создайте новый веб-приложение и скачайте профиль публикации.
-
-3. Перейдите в настройки вашего репозитория на GitHub, добавьте секрет `AzureWebAppPublishProfile` и вставьте туда содержимое файла профиля публикации.
-
-4. Сделайте коммит и пуш изменений:
-   ```bash
-   git add .
-   git commit -m "Setup GitHub Actions for CD"
-   git push
-   ```
-
-### Проверка работы
-Перейдите в раздел Actions вашего репозитория на GitHub и убедитесь, что оба workflow выполняются корректно при каждом пуше. Убедитесь, что ваше приложение развёрнуто на Azure.
-
-## Самостоятельная работа
-### Задание 1: Автоматическая сборка и тестирование проекта
-**Задание:** Настройте GitHub Actions для автоматической сборки и тестирования проекта на .NET при каждом push в ветку `main`.
-
-1. Создайте workflow файл в `.github/workflows` и назовите его `build-and-test.yml`.
-2. Настройте триггер на событие `push` для ветки `main`.
-3. Настройте шаги для:
-    - Установки .NET SDK.
-    - Сборки проекта.
-    - Запуска юнит-тестов.
-4. Убедитесь, что все шаги прошли успешно для подтверждения задания.
-
-Понял! Вот вариант задания, который не включает деплой в облако.
-
-### Задание 2: Генерация и публикация отчетов о покрытии кода
-**Задание:** Настройте GitHub Actions для генерации и публикации отчетов о покрытии кода при каждом push в ветку `main`.
-
-1. Создайте workflow файл в `.github/workflows` и назовите его `code-coverage.yml`.
-2. Настройте триггер на событие `push` для ветки `main`.
-3. Добавьте шаги для:
-    - Установки .NET SDK.
-    - Сборки проекта.
-    - Запуска тестов с генерацией отчетов о покрытии кода (используя инструменты типа Coverlet).
-    - Публикации отчетов о покрытии кода в формате HTML в GitHub Pages (используйте `gh-pages` branch).
-4. Убедитесь, что отчеты о покрытии кода доступны на GitHub Pages и содержат актуальные данные.
-
-#### Пример `code-coverage.yml`:
-
+Пример YAML-файла:
 ```yaml
-name: CI - Code Coverage
+name: Sample Workflow
+on: [push]  # Событие, при котором запускается workflow
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Платформа для запуска задачи
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+```
 
-on:
-  push:
-    branches:
-      - main
+### 3. Основные компоненты GitHub Actions
+
+#### 3.1 Workflow (Рабочий процесс)
+
+**Workflow** — это основной сценарий, описывающий действия, которые нужно выполнить при определённом событии. Каждый workflow создаётся в виде YAML-файла в папке `.github/workflows`. Он состоит из одного или нескольких **jobs** (задач), которые выполняются либо последовательно, либо параллельно.
+
+**Структура workflow**:
+- **Имя workflow**: поле `name` (опционально), которое служит для обозначения рабочего процесса.
+- **Триггеры запуска (`on`)**: определяют события, при которых запускается workflow, например, `push`, `pull_request`, `schedule` (для расписания).
+- **Jobs (Задачи)**: основной набор действий, который выполняется в рамках workflow.
+
+Пример простого workflow:
+```yaml
+name: Build and Test Workflow
+
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '6.0.x'  # Укажите вашу версию .NET
-
-    - name: Restore dependencies
-      run: dotnet restore
-
-    - name: Build project
-      run: dotnet build --configuration Release
-
-    - name: Run tests with coverage
-      run: dotnet test --configuration Release --collect:"XPlat Code Coverage"
-
-    - name: Generate coverage report
-      run: |
-        REPORT_DIR=$(pwd)/coverage
-        mkdir -p $REPORT_DIR
-        reportgenerator -reports:**/coverage.cobertura.xml -targetdir:$REPORT_DIR -reporttypes:Html
-
-    - name: Deploy coverage report to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./coverage
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build
+        run: dotnet build src/YourProject.csproj
 ```
 
-Для выполнения этого задания необходимо:
+#### 3.2 Jobs (Задачи)
 
-1. Добавить инструмент для анализа покрытия кода, например, Coverlet, в проект на .NET.
-2. Настроить генерацию отчетов о покрытии кода в формате HTML.
-3. Настроить GitHub Pages для публикации отчетов.
+**Job** — это набор **steps** (шагов), которые выполняются в рамках одного окружения. Каждый job может выполняться на разных платформах и может содержать команды, действия или даже сценарии. В GitHub Actions можно создавать несколько jobs в одном workflow, которые выполняются как последовательно, так и параллельно.
 
-Работая над этим заданием, студенты научатся:
+Основные параметры для jobs:
+- **runs-on**: платформа, на которой будет выполняться задача (например, `ubuntu-latest`, `windows-latest`, `macos-latest`).
+- **steps**: описание шагов, которые нужно выполнить.
 
-- Использовать покрытия кода для анализа качества тестирования.
-- Интегрировать инструменты тестирования и генерации отчетов с CI/CD процессами.
-- Публиковать отчеты на GitHub Pages для удобного доступа и просмотра.
+Пример job:
+```yaml
+build:
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
+    - name: Build project
+      run: dotnet build src/YourProject.csproj
+```
 
-### Задание 3: Анализ кода с помощью SonarCloud
-**Задание:** Настройте GitHub Actions для запуска анализа кода с помощью SonarCloud при каждом pull request в ветку `main`.
+#### 3.3 Steps (Шаги)
 
-1. Создайте workflow файл в `.github/workflows` и назовите его `code-analysis.yml`.
-2. Настройте триггер на событие `pull_request` для ветки `main`.
-3. Добавьте шаги для:
-    - Установки .NET SDK.
-    - Установки SonarCloud CLI.
-    - Конфигурации и запуска анализа кода с использованием SonarCloud (с использванием токенов).
-4. Убедитесь, что результаты анализа кода отображаются в панели SonarCloud.
+**Step** — это действие, выполняемое внутри задачи (job). Шаг может быть командой в командной строке, командой, записанной непосредственно в YAML, или встроенным действием. Шаги выполняются последовательно в рамках одного job.
 
-### Задание 4: Генерация документации с помощью DocFX
-**Задание:** Настройте GitHub Actions для автоматической генерации документации проекта с помощью DocFX и публикации её в GitHub Pages.
+Типы шагов:
+- **Команда**: выполняется напрямую в рамках job (например, `run: dotnet build`).
+- **Действие (Action)**: шаг, использующий готовое действие из GitHub Marketplace (например, `uses: actions/checkout@v4`).
 
-1. Создайте workflow файл в `.github/workflows` и назовите его `generate-docs.yml`.
-2. Настройте триггер на событие `push` для ветки `main`.
-3. Добавьте шаги для:
-    - Установки DocFX.
-    - Сборки и генерации документации.
-    - Публикации сгенерированной документации в GitHub Pages (используйте `gh-pages` branch).
-4. Убедитесь, что документация доступна на GitHub Pages.
+Пример steps:
+```yaml
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
+  - name: Setup .NET
+    uses: actions/setup-dotnet@v4
+    with:
+      dotnet-version: '6.0.x'
+  - name: Build project
+    run: dotnet build src/YourProject.csproj
+```
 
-### Задание 5: Проверка кода на соответствие стилю с использованием StyleCop
-**Задание:** Настройте GitHub Actions для проверки кода на соответствие стилю с использованием StyleCop при каждом pull request в репозиторий.
+#### 3.4 Actions (Действия)
 
-1. Создайте workflow файл в `.github/workflows` и назовите его `style-check.yml`.
-2. Настройте триггер на событие `pull_request`.
-3. Добавьте шаги для:
-    - Установки .NET SDK.
-    - Установки и конфигурации StyleCop.
-    - Запуска проверки стиля кода.
-4. Убедитесь, что результаты проверки отображаются в интерфейсе GitHub при создании pull request.
+**Action** — это единица, которая позволяет выполнить определённое действие в рамках GitHub Actions. Существуют как встроенные действия, разработанные GitHub, так и действия, опубликованные сообществом. Действия могут устанавливаться из GitHub Marketplace или создаваться и использоваться локально.
 
-Эти задания позволят студентам понять и применить различные аспекты автоматизации рабочего процесса с помощью GitHub Actions в контексте проектов на .NET.
+Примеры популярных действий:
+- **actions/checkout**: для загрузки кода из репозитория.
+- **actions/setup-dotnet**: для установки .NET SDK.
 
-## Заключение
-В этой лабораторной работе вы настроили базовый процесс CI/CD для .NET-приложения с использованием GitHub Actions и Azure. Вы можете расширить и улучшить этот процесс, добавляя новые шаги и интеграции по мере необходимости.
+### 4. Типы выполнения пайплайнов
+
+GitHub Actions поддерживает несколько типов выполнения задач. Выбор подходящего типа выполнения зависит от структуры проекта и требований к CI/CD.
+
+#### 4.1 Последовательное выполнение
+
+Последовательное выполнение — это выполнение задач одна за другой. В таких случаях следующая задача запускается только после завершения предыдущей. Этот тип подходит для задач, которые зависят друг от друга, например, сборка и тестирование (тестирование невозможно, если сборка не завершена).
+
+Пример последовательного выполнения:
+```yaml
+name: Sequential Workflow
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build project
+        run: dotnet build src/YourProject.csproj
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run tests
+        run: dotnet test src/YourProject.Tests.csproj
+```
+В данном примере `test` зависит от завершения `build` и выполняется только после него, что задаётся ключевым словом `needs`.
+
+#### 4.2 Параллельное выполнение
+
+При параллельном выполнении задачи запускаются одновременно. Это удобно для одновременного выполнения различных видов тестирования или проверки кода в разных конфигурациях.
+
+Пример параллельного выполнения:
+```yaml
+name: Parallel Workflow
+
+on: [push]
+
+jobs:
+  build-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build Debug
+        run: dotnet build src/YourProject.csproj --configuration Debug
+
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build Release
+        run: dotnet build src/YourProject.csproj --configuration Release
+```
+`build-debug` и `build-release` выполняются параллельно и проверяют разные конфигурации (`Debug` и `Release`).
+
+#### 4.3 Комбинированное выполнение
+
+Комбинированное выполнение сочетает последовательные и параллельные задачи. Например, можно сначала собрать проект, а затем запустить параллельно тесты и анализ кода кода. Комбинированное выполнение позволяет создавать более гибкие и эффективные сценарии для CI/CD, где часть задач выполняется последовательно, а часть — параллельно. Этот подход полезен для сложных пайплайнов, где важно обеспечить определённые зависимости между задачами.
+
+Пример комбинированного выполнения:
+```yaml
+name: Combined Workflow
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Build project
+        run: dotnet build src/YourProject.csproj
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0.x'
+      - name: Run tests
+        run: dotnet test src/YourProject.Tests.csproj --configuration ${{ matrix.configuration }}
+
+  analyze:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run code analysis
+        run: dotnet tool install -g dotnet-format && dotnet format src/YourProject.csproj
+```
+
+В этом примере:
+- Сначала выполняется задача `build` (сборка).
+- После её завершения параллельно запускаются задачи `test` и `analyze`.
+- `test` выполняется на двух конфигурациях (Debug и Release) с помощью `matrix`, что позволяет одновременно протестировать разные настройки.
+
+Комбинированное выполнение пайплайна удобно тем, что можно настроить последовательные зависимости для задач, требующих завершения предыдущих этапов, и одновременно использовать параллельные ветки для независимых задач.
+
+### 5. Как настроить workflow в GitHub Actions
+
+#### Создание workflow с нуля
+
+Чтобы создать workflow с нуля:
+1. В корне репозитория создайте папку `.github/workflows`.
+2. В этой папке создайте файл конфигурации с расширением `.yml` (например, `ci.yml`).
+3. Опишите workflow с использованием YAML.
+
+#### События для запуска workflow
+
+GitHub Actions позволяет настраивать автоматический запуск workflow на основе различных событий:
+- **push**: запускается при каждом коммите в репозиторий.
+- **pull_request**: запускается при открытии, обновлении или закрытии pull request.
+- **schedule**: запускается по расписанию, например, каждый день или каждую неделю, используя синтаксис [cron](https://en.wikipedia.org/wiki/Cron).
+- **workflow_dispatch**: позволяет вручную запускать workflow с GitHub UI.
+  
+Пример с различными событиями:
+```yaml
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * 1'  # Запуск каждую неделю в понедельник
+```
+
+#### Переменные и секреты в GitHub Actions
+
+GitHub Actions позволяет использовать переменные окружения и секреты для управления конфиденциальной информацией, например, токенами и паролями.
+
+- **Переменные окружения** можно объявить прямо в YAML, используя ключ `env`:
+  ```yaml
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      env:
+        ENVIRONMENT: production
+      steps:
+        - name: Print environment
+          run: echo "Environment is $ENVIRONMENT"
+  ```
+
+- **Секреты** (secrets) можно задавать в настройках репозитория на GitHub и использовать в workflow:
+  ```yaml
+  jobs:
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy to server
+          env:
+            API_TOKEN: ${{ secrets.API_TOKEN }}
+          run: curl -X POST -H "Authorization: Bearer $API_TOKEN" https://api.example.com/deploy
+  ```
+
+### 6. Практические сценарии применения GitHub Actions
+
+1. **Сборка и тестирование**: Автоматизация сборки и тестирования проекта при каждом коммите или pull request позволяет оперативно находить ошибки.
+2. **Анализ кода**: Инструменты анализа кода (линтеры и форматтеры) помогают поддерживать единый стиль кода и следить за его качеством.
+3. **Публикация артефактов**: Можно настроить автоматическую публикацию артефактов, таких как сборки или отчёты, для последующего использования или анализа.
+4. **Развертывание**: GitHub Actions позволяет настроить автоматическое развертывание кода на сервере или облачной платформе после успешного прохождения всех проверок.
+
+## Практическая часть
+
+### Общее задание
+
+1. Создайте новый репозиторий на GitHub и добавьте туда простой C# проект (решение содержащее: консольное приложение, библиотеку классов или ASP.NET проект и unit тесты к нему, можно использовать лабораторные по тестированию за прошлый семестр).
+2. Создайте папку `.github/workflows` и в ней файл `ci.yml`.
+3. Настройте `ci.yml` для последовательного выполнения задач:
+   - Добавьте задачу для сборки приложения.
+   - Добавьте задачу для тестирования, которая зависит от задачи сборки.
+4. Модифицируйте `ci.yml` для параллельного выполнения:
+   - Добавьте параллельное тестирование приложения в различных конфигурациях (Debug и Release).
+5. Создайте комбинированный пайплайн:
+   - Настройте задачу для сборки.
+   - Добавьте задачи тестирования и анализа кода, которые выполняются параллельно после сборки.
+
+### Индивидуальное задание (на высокий балл)
+
+#### Задание 1: Публикация артефактов с несколькими конфигурациями
+
+**Описание:** Настройте workflow, который выполняет сборку и тестирование проекта в двух конфигурациях (Debug и Release), а затем сохраняет артефакты сборки для каждой из конфигураций.
+
+**Требования:**
+1. Workflow должен запускаться при открытии pull request.
+2. Настройте `build` с матрицей конфигураций (`Debug` и `Release`), чтобы сборка выполнялась параллельно для обеих конфигураций.
+3. Сохраните артефакты сборки (исполняемые файлы или библиотеки) в виде отдельных архивов для каждой конфигурации (`Debug` и `Release`).
+4. Убедитесь, что оба артефакта доступны для загрузки после успешного выполнения workflow.
+
+---
+
+#### Задание 2: Настройка отчёта о покрытии кода и публикация его как артефакта
+
+**Описание:** Настройте workflow, который выполняет сборку и тестирование проекта, а затем генерирует отчёт о покрытии кода. Опубликуйте отчёт о покрытии в виде артефакта, доступного для загрузки.
+
+**Требования:**
+1. Workflow должен запускаться при коммите в ветку `main`.
+2. Настройте задачу `build` для сборки проекта в конфигурации `Release`.
+3. Добавьте задачу `test`, которая запускает тесты с генерацией отчёта о покрытии кода (например, используя `coverlet` для покрытия в формате `cobertura`).
+4. Сохраните отчёт о покрытии кода как артефакт с именем `code-coverage` и сделайте его доступным для загрузки после выполнения workflow.
+
+---
+
+### Вопросы для закрепления материала
+
+1. Какова цель использования GitHub Actions?
+2. Какую роль выполняют YAML файлы в GitHub Actions?
+3. Чем отличается последовательное выполнение задач от параллельного?
+4. В каких случаях рекомендуется использовать комбинированное выполнение?
+5. Что такое `needs` в GitHub Actions и для чего оно используется?
